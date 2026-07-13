@@ -149,7 +149,7 @@ End
 //           as a standalone graph. Places cursors at 30%/70%.
 // Notes   : Standalone alternative to plot_raw_panel for cases
 //           where only the stimulus needs to be inspected.
-//           TODO: replace inline Cursor calls with place_cursors()
+//           Cursor placement via place_cursors() (Utils).
 // ------------------------------------------------------------
 Function plot_stim()
 
@@ -171,13 +171,9 @@ Function plot_stim()
     EnsureGraphWindow(win_name, "Stimulus", 200, 200, 700, 500)
     AppendXYWaveListToGraph(win_name, amp_list, dur_list, stim_folder)
 
-    // Place cursors on last appended trace
-    // TODO: replace with place_cursors() once refactor is complete
-    Wave yw_last     = $(stim_folder + StringFromList(n-1, amp_list))
-    String last_name = StringFromList(n-1, amp_list)
-    Variable x_range = rightx(yw_last) - leftx(yw_last)
-    Cursor/H=2/L=1/W=$win_name A, $last_name, leftx(yw_last) + x_range * 0.3
-    Cursor/H=2/L=1/W=$win_name B, $last_name, leftx(yw_last) + x_range * 0.7
+    // Place cursors on last appended wave via shared helper
+    Wave yw_last = $(stim_folder + StringFromList(n-1, amp_list))
+    place_cursors(win_name, yw_last, 0.3, 0.7)
     ShowInfo/W=$win_name
 
     StoreCursorWavePath(win_name, yw_last)

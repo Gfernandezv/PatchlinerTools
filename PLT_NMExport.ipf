@@ -82,12 +82,12 @@ Function ExportChannelToNM()
     NMExport_InitFolder(nm_folder, nm_prefix, nChans)
 
     // Export each chan_X into its corresponding NM channel letter
-    String chan_letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    // chan letter = A + i via num2char/char2num (cross-platform)
     Variable i
     for (i = 0; i < nChans; i += 1)
         String chan_name   = StringFromList(i, chan_list)
         String chan_path   = current_folder + chan_name + ":"
-        String chan_letter = chan_letters[i, i]
+        String chan_letter = num2char(char2num("A") + i)
 
         Variable nWaves = NMExport_CopyWaves(chan_path, nm_folder, nm_prefix, "Trace", chan_letter)
         LogInfo("ExportChannelToNM: " + chan_name + " → Chan" + chan_letter + \
@@ -136,10 +136,9 @@ Function NMExport_InitFolder(nm_folder, nm_prefix, nChans)
     NewDataFolder/O $prefix_df
 
     // One ChanX subfolder per Patchliner channel
-    String chan_letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     Variable i
     for (i = 0; i < nChans; i += 1)
-        String chan_letter = chan_letters[i, i]
+        String chan_letter = num2char(char2num("A") + i)
         NewDataFolder/O $(prefix_df + ":Chan" + chan_letter)
     endfor
 

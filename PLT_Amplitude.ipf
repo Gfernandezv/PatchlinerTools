@@ -54,7 +54,11 @@ Function plot_amp_analysis(mode)
     String maxwave_name  = "'"+mut_name + "_" + traces_prefix + "_" + chan + "_Amp'"
 
     String amp_folder    = CheckDataFolder(ParentFolder(current_folder, 2) + "Ramp_Analysis")
-    String amp_name      = amp_retreiver(maxwave_name, 6, 20, 5, amp_folder)
+    // Read temperature grid from Packages globals; fall back to defaults
+    Variable nT = NumVarOrDefault("root:Packages:amp_nT", 6)
+    Variable t0 = NumVarOrDefault("root:Packages:amp_t0", 20)
+    Variable dt = NumVarOrDefault("root:Packages:amp_dt", 5)
+    String amp_name = amp_retreiver(maxwave_name, nT, t0, dt, amp_folder)
     Wave maxwave         = $(amp_folder + amp_name)
 	 
 	 
@@ -98,29 +102,29 @@ Function MakeTwoPanels_plot_amp(w, title, maxwave)
 
     DrawText 180, 30, "Fit mode 2"
 
-Display/HOST=Fig1/N=Amp2/W=(10,50,410,350) w_col2
-ModifyGraph/W=Fig1#Amp2 mode(w_col2)=4, marker(w_col2)=19
-Variable nT = numpnts(w_col2)
-LoadCividis()    // ensures root:Packages:ColorTables:Misc: exists
-Make/O/N=(nT) root:Packages:ColorTables:Misc:cividis_zwave
-Wave cividis_zwave = root:Packages:ColorTables:Misc:cividis_zwave
-cividis_zwave = p
-ModifyGraph/W=Fig1#Amp2 zColor(w_col2)={cividis_zwave,0,nT-1,Rainbow,0}
-      
+    Display/HOST=Fig1/N=Amp2/W=(10,50,410,350) w_col2
+    ModifyGraph/W=Fig1#Amp2 mode(w_col2)=4, marker(w_col2)=19
+
+    Variable nPts = numpnts(w_col2)
+    LoadCividis()
+    Make/O/N=(nPts) root:Packages:ColorTables:Misc:cividis_zwave
+    Wave cividis_zwave = root:Packages:ColorTables:Misc:cividis_zwave
+    cividis_zwave = p
+    ModifyGraph/W=Fig1#Amp2 zColor(w_col2)={cividis_zwave,0,nPts-1,Rainbow,0}
+
     Edit/HOST=Fig1/K=1/N=Tabla_max/W=(430,50,870,350) maxwave.ld
     ModifyTable/W=Fig1#Tabla_max font="Arial", size=10, showParts=0x04
-    
-	 Display/HOST=Fig1/N=curve1/W=(900,50,1300,190) maxwave[][%Amplitude] vs maxwave[][%Temp]
-	 ModifyGraph/W=Fig1#curve1 mode=4,marker=8,msize=3,opaque=1,lstyle=3,rgb=(65535,0,0,32768),useMrkStrokeRGB=1
-	 
-	 Display/HOST=Fig1/N=curve2/W=(900,210,1300,350) maxwave[][%lnAmplitude] vs maxwave[][%invtemp]
-	 Label/W=Fig1#curve2 left "ln I0/Imax"
+
+    Display/HOST=Fig1/N=curve1/W=(900,50,1300,190)  maxwave[][%Amplitude]   vs maxwave[][%Temp]
+    ModifyGraph/W=Fig1#curve1 mode=4, marker=8, msize=3, opaque=1, lstyle=3, rgb=(65535,0,0,32768), useMrkStrokeRGB=1
+
+    Display/HOST=Fig1/N=curve2/W=(900,210,1300,350) maxwave[][%lnAmplitude] vs maxwave[][%invtemp]
+    Label/W=Fig1#curve2 left   "ln I0/Imax"
     Label/W=Fig1#curve2 bottom "1/T (1/°K)"
-	 ModifyGraph/W=Fig1#curve2 mode=4,marker=8,msize=3,opaque=1,lstyle=3,rgb=(65535,0,0,32768),useMrkStrokeRGB=1
+    ModifyGraph/W=Fig1#curve2 mode=4, marker=8, msize=3, opaque=1, lstyle=3, rgb=(65535,0,0,32768), useMrkStrokeRGB=1
 	 
-    // Cursor placement — string name required for hosted subgraphs
-    String w_col2_name = NameOfWave(w_col2)
-	 place_cursors("Fig1#Amp2", w_col2, 0.1, 0.9)
+    // Cursor placement via shared helper
+    place_cursors("Fig1#Amp2", w_col2, 0.1, 0.9)
 
     DoUpdate
     ShowInfo/W=Fig1

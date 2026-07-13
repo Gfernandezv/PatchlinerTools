@@ -115,6 +115,10 @@ Function LogButtonProc(ctrlName) : ButtonControl
             IV_graph()
             break
 
+        case "btnExportNM":
+            ExportChannelToNM()
+            //print "exporting"
+            break
     endswitch
 
     return 0

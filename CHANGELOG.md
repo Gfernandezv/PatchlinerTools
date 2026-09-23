@@ -1,5 +1,7 @@
 # Changelog
 
+> The entries below document the historical v0.1 eight-module layout. The restored v2.0 source has six differently organized modules; see the current README for its scope and limitations.
+
 All notable changes to the Nanion Patchliner Analysis Toolkit are documented here.  
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).  
 Versioning follows [Semantic Versioning](https://semver.org/).
